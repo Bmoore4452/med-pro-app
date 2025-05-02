@@ -17,12 +17,17 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+from environs import Env
+
+env = Env()
+env.read_env()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-+z6r+b-&e76s$t#!wd%nnv4jv*b%2(s%&j_hpx8h*qhclqi%b)"
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -33,6 +38,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "jazzmin",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -46,6 +52,8 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt.token_blacklist",
     "corsheaders",
+    "anymail",
+    "drf_yasg",
 ]
 
 MIDDLEWARE = [
@@ -64,7 +72,7 @@ ROOT_URLCONF = "backend.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [os.path.join(BASE_DIR, "templates")],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -135,6 +143,20 @@ MEDIA_URL = "/media/"
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
+AUTH_USER_MODEL = "userauths.User"
+
+MAILGUN_API_KEY = os.getenv("MAILGUN_API_KEY")
+MAILERSEND_API_TOKEN = os.getenv("MAILERSEND_API_TOKEN")
+MAILGUN_SENDER_DOMAIN = os.getenv("MAILGUN_SENDER_DOMAIN")
+
+ANYMAIL = {
+    "MAILGUN_API_KEY": os.getenv("MAILGUN_API_KEY"),
+    "MAILGUN_SENDER_DOMAIN": os.getenv("MAILGUN_SENDER_DOMAIN"),
+}
+
+FROM_EMAIL = os.getenv("FROM_EMAIL")
+EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
@@ -142,12 +164,12 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 JAZZMIN_SETTINGS = {
     # title of the window (Will default to current_admin_site.site_title if absent or None)
-    "site_title": "Fitness App Admin",
-    "site_header": "Fitness App",
-    "site_brand": "Fitness App",
+    "site_title": "Med Pro App Admin",
+    "site_header": "Med Pro App",
+    "site_brand": "Med Pro App",
     # "site_logo": "path-to-logo",
-    "welcome_sign": "Welcome to the Fitness App Admin",
-    "copyright": "All Things Fit Ltd",
+    "welcome_sign": "Welcome to the Med Pro App Admin",
+    "copyright": "Med Pro Ltd",
     "show_ui_builder": True,
 }
 

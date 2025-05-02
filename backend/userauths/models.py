@@ -6,16 +6,6 @@ from django.db.models.signals import post_save
 
 
 class User(AbstractUser):
-    groups = models.ManyToManyField(
-        "auth.Group",
-        related_name="custom_user_groups",  # Change this to a unique name
-        blank=True,
-    )
-    user_permissions = models.ManyToManyField(
-        "auth.Permission",
-        related_name="custom_user_permissions",  # Change this to a unique name
-        blank=True,
-    )
     username = models.CharField(max_length=100, unique=True)
     email = models.EmailField(max_length=100, unique=True)
     full_name = models.CharField(max_length=100, unique=True)
@@ -41,6 +31,7 @@ class User(AbstractUser):
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     full_name = models.CharField(max_length=100)
+    date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         if self.full_name:
@@ -56,7 +47,7 @@ class Profile(models.Model):
 
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
-        profile = Profile.objects.create(user=instance)
+        Profile.objects.create(user=instance)
 
 
 def save_user_profile(sender, instance, **kwargs):

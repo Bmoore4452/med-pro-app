@@ -4,7 +4,14 @@ from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
 
 urlpatterns = [
-    path("token/", api_views.MyTokenObtainView.as_view(), name="token_obtain_pair"),
-    path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
-    path("register/", api_views.RegisterView.as_view(), name="register"),
+    path(
+        "user/token/", api_views.MyTokenObtainView.as_view(), name="token_obtain_pair"
+    ),
+    path("user/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path("user/register/", api_views.RegisterView.as_view(), name="register"),
+    path(
+        "user/password-reset/<email>/",
+        api_views.PasswordResetEmailVerifyAPIView.as_view(),
+    ),
+    path("user/password-change/", api_views.PasswordChangeAPIView.as_view()),
 ]
