@@ -6,7 +6,17 @@ from django.template.loader import render_to_string
 
 
 from api import serializer as api_serializer
-from userauths.models import User, Question, Answer, Response, Result, Feedback, Profile
+from userauths.models import (
+    User,
+    Profile,
+    Result,
+    Feedback,
+    QuestionLevel,
+    QuestionType,
+    AssessmentQuestion,
+    Choice,
+    AssessmentResponse,
+)
 
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework import generics, status, permissions
@@ -114,3 +124,14 @@ class PasswordChangeAPIView(generics.CreateAPIView):
                 {"message": "User does not exist"},
                 status=status.HTTP_404_NOT_FOUND,
             )
+
+
+class SubmitResponsesAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        serializer = api_serializer.SubmitResponsesSerializer(data=request.data)
+        if serializer.is_valid():
+            result = serializer.save()
+            return Response(result, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
