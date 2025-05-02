@@ -136,7 +136,7 @@ html {
 }
 
 #sidebar ul li.active a {
-    color: var(--base-clr);
+    color: var(--text-clr);
     svg {
         fill: var(--accent-clr);
     }

@@ -1,387 +1,106 @@
 import React, { useEffect, useState } from 'react';
 import useAxios from '../../utils/useAxios';
-import Sidebar from '../../views/partials/Sidebar';
-import BaseHeader from '../../views/partials/BaseHeader';
+import Sidebar from '../partials/Sidebar';
+import BaseHeader from '../partials/BaseHeader';
+import { useAuthStore } from '../../store/auth';
 
-function ProfilePage() {
-    const axiosInstance = useAxios;
-    const [profile, setProfile] = useState('');
-    const [isEditing, setIsEditing] = useState(false);
-    const [isSaving, setIsSaving] = useState(false);
-    const [previewImage, setPreviewImage] = useState(null);
+const ProfilePage = () => {
+    const axios = useAxios;
+    const user = useAuthStore((state) => state.allUserData);
+    const firstName = user?.full_name?.split(' ')[0] || 'User';
 
-    const handleImageClick = (imageSrc) => {
-        setPreviewImage(imageSrc); // Set the clicked image as the preview
-    };
-
-    const closePreview = () => {
-        setPreviewImage(null); // Close the preview
-    };
+    const [results, setResults] = useState([]);
 
     useEffect(() => {
-        const fetchProfile = async () => {
-            try {
-                const res = await axiosInstance.get('/user/profile/');
-                setProfile(res.data);
-            } catch (err) {
-                console.error('Error fetching profile', err);
-            }
-        };
-
-        fetchProfile();
-    }, [axiosInstance]);
-
-    console.log('Profile:', profile);
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        console.log(`Field: ${name}, Value: ${value}`);
-        setProfile((prev) => ({
-            ...prev,
-            [name]: value
-        }));
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
-        const data = new FormData();
-
-        if (profile) {
-            console.log('Submitting profile:', profile);
-
-            for (const key in profile) {
-                if (
-                    key !== 'image' &&
-                    profile[key] !== null &&
-                    profile[key] !== undefined &&
-                    profile[key] !== ''
-                ) {
-                    let value = profile[key];
-                    if (key === 'weight') {
-                        value = parseFloat(value); // Convert weight to a number
-                    } else if (key === 'age') {
-                        value = parseInt(value, 10); // Convert age to an integer
-                    }
-
-                    data.append(key, value);
+        // Simulate demo/mock data instead of live API call
+        const mockData = [
+            {
+                level: '1',
+                score: 85.0,
+                passed: true,
+                feedback: null
+            },
+            {
+                level: '2',
+                score: 72.5,
+                passed: true,
+                feedback: null
+            },
+            {
+                level: '3',
+                score: 55.0,
+                passed: false,
+                feedback: {
+                    recommendation:
+                        'Review your approach to ethical scenarios and consider reattempting the ethics module.'
                 }
             }
-        }
+        ];
+        setResults(mockData);
+    }, []);
 
-        // Handle image (as File, not string or object)
-        if (
-            profile.image instanceof File ||
-            (profile.image && profile.image[0] instanceof File)
-        ) {
-            data.append(
-                'image',
-                profile.image instanceof File ? profile.image : profile.image[0]
-            );
-        }
-
-        setIsSaving(true);
-        try {
-            const res = await axiosInstance.put('/user/profile/', data, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            });
-
-            console.log('✅ Profile updated!', res.data);
-            setProfile(res.data);
-            setIsEditing(false);
-        } catch (err) {
-            console.error(
-                '❌ Error submitting profile:',
-                err.response?.data || err.message
-            );
-        } finally {
-            setIsSaving(false);
-        }
-    };
-
-    document.title = 'My Profile | Med Pro Assesments';
+    document.title = `${firstName}'s Assessment Profile | Med Pro Assessments`;
 
     return (
-        <>
-            <div className="container-fluid d-flex flex-sm-row">
-                <Sidebar />
-                <div className="main-content">
-                    <BaseHeader />
-                    <div className="content p-4">
-                        <h2>My Profile</h2>
-                        {!profile ? (
-                            <p>Loading...</p>
-                        ) : (
-                            <div>
-                                <img
-                                    src={`http://localhost:8000${profile.image}`}
-                                    alt="Profile"
-                                    width={300}
-                                    className="profile-picture rounded shadow mb-3"
-                                    onClick={() =>
-                                        handleImageClick(
-                                            `http://localhost:8000/${profile.image}`
-                                        )
-                                    }
-                                />
-                                {previewImage && (
-                                    <div
-                                        className="image-preview-modal"
-                                        onClick={closePreview}
-                                    >
-                                        <img
-                                            src={previewImage}
-                                            alt="Preview"
-                                            className="full-image"
-                                        />
+        <div className="container-fluid d-flex flex-sm-row">
+            <Sidebar />
+            <div className="main-content">
+                <BaseHeader />
+                <div className="p-4 space-y-6">
+                    <h1 className="text-2xl font-bold mb-4">
+                        {firstName}'s Assessment Results
+                    </h1>
+                    <div className="row">
+                        {results.length > 0 ? (
+                            results.map((result, index) => (
+                                <div className="col-md-4 mb-4" key={index}>
+                                    <div className="card shadow h-100">
+                                        <div className="card-body">
+                                            <h5 className="card-title">
+                                                Level {result.level} -{' '}
+                                                {result.level === '1'
+                                                    ? 'Soft Skills'
+                                                    : result.level === '2'
+                                                      ? 'Teamwork'
+                                                      : 'Ethics'}
+                                            </h5>
+                                            <p className="card-text">
+                                                <strong>Score:</strong>{' '}
+                                                {result.score}%
+                                            </p>
+                                            <p className="card-text">
+                                                <strong>Status:</strong>{' '}
+                                                {result.passed ? (
+                                                    <span className="text-success">
+                                                        Passed
+                                                    </span>
+                                                ) : (
+                                                    <span className="text-danger">
+                                                        Failed
+                                                    </span>
+                                                )}
+                                            </p>
+                                            {result.feedback && (
+                                                <p className="card-text">
+                                                    <strong>Feedback:</strong>{' '}
+                                                    {
+                                                        result.feedback
+                                                            .recommendation
+                                                    }
+                                                </p>
+                                            )}
+                                        </div>
                                     </div>
-                                )}
-
-                                {isEditing ? (
-                                    <>
-                                        <div className="mb-3">
-                                            <label
-                                                htmlFor="image"
-                                                className="form-label"
-                                            >
-                                                <strong>
-                                                    Change Profile Image:
-                                                </strong>
-                                            </label>
-                                            <input
-                                                type="file"
-                                                className="form-control"
-                                                id="image"
-                                                name="image"
-                                                accept="image/*"
-                                                onChange={(e) =>
-                                                    setProfile((prev) => ({
-                                                        ...prev,
-                                                        image: e.target.files
-                                                    }))
-                                                }
-                                            />
-                                            <label
-                                                className="form-label"
-                                                htmlFor="full_name"
-                                            >
-                                                <strong>Full Name:</strong>
-                                            </label>
-                                            <input
-                                                type="text"
-                                                id="full_name"
-                                                name="full_name"
-                                                value={profile.full_name}
-                                                onChange={handleChange}
-                                                className="form-control"
-                                            />
-                                        </div>
-                                        <div className="mb-3">
-                                            <label
-                                                className="form-label"
-                                                htmlFor="age"
-                                            >
-                                                <strong>Age:</strong>
-                                            </label>
-                                            <input
-                                                type="number"
-                                                id="age"
-                                                name="age"
-                                                placeholder="Age"
-                                                value={profile.age || ''}
-                                                onWheel={(e) => e.target.blur()}
-                                                onChange={handleChange}
-                                                className="form-control"
-                                            />
-                                        </div>
-                                        <div className="mb-3">
-                                            <label
-                                                className="form-label"
-                                                htmlFor="weight"
-                                            >
-                                                <strong>Weight:</strong>
-                                            </label>
-                                            <input
-                                                type="number"
-                                                id="weight"
-                                                name="weight"
-                                                value={profile.weight || ''}
-                                                onWheel={(e) => e.target.blur()}
-                                                onChange={handleChange}
-                                                className="form-control"
-                                            />
-                                        </div>
-                                        <div className="mb-3">
-                                            <label
-                                                className="form-label"
-                                                htmlFor="occupation"
-                                            >
-                                                <strong>Occupation:</strong>
-                                            </label>
-                                            <input
-                                                type="text"
-                                                id="occupation"
-                                                name="occupation"
-                                                value={profile.occupation}
-                                                onChange={handleChange}
-                                                className="form-control"
-                                            />
-                                        </div>
-                                        <div className="mb-3">
-                                            <label
-                                                className="form-label"
-                                                htmlFor="emergency_contact_name"
-                                            >
-                                                <strong>
-                                                    Emergency Contact Name:
-                                                </strong>
-                                            </label>
-                                            <input
-                                                type="text"
-                                                id="emergency_contact_name"
-                                                name="emergency_contact_name"
-                                                value={
-                                                    profile.emergency_contact_name
-                                                }
-                                                onChange={handleChange}
-                                                className="form-control"
-                                            />
-                                        </div>
-                                        <div className="mb-3">
-                                            <label
-                                                className="form-label"
-                                                htmlFor="emergency_contact"
-                                            >
-                                                <strong>
-                                                    Emergency Contact:
-                                                </strong>
-                                            </label>
-                                            <input
-                                                type="text"
-                                                id="emergency_contact"
-                                                name="emergency_contact"
-                                                value={
-                                                    profile.emergency_contact
-                                                }
-                                                onChange={handleChange}
-                                                className="form-control"
-                                            />
-                                        </div>
-                                        <div className="mb-3">
-                                            <label
-                                                className="form-label"
-                                                htmlFor="phone_number"
-                                            >
-                                                <strong>Phone Number:</strong>
-                                            </label>
-                                            <input
-                                                type="text"
-                                                id="phone_number"
-                                                name="phone_number"
-                                                value={profile.phone_number}
-                                                onChange={handleChange}
-                                                className="form-control"
-                                            />
-                                        </div>
-                                        <div className="mb-3">
-                                            <label
-                                                className="form-label"
-                                                htmlFor="address"
-                                            >
-                                                <strong>Address:</strong>
-                                            </label>
-                                            <textarea
-                                                id="address"
-                                                name="address"
-                                                value={profile.address}
-                                                onChange={handleChange}
-                                                className="form-control"
-                                            ></textarea>
-                                        </div>
-                                        <div className="mb-3">
-                                            <label
-                                                className="form-label"
-                                                htmlFor="medical_history"
-                                            >
-                                                <strong>
-                                                    Medical History:
-                                                </strong>
-                                            </label>
-                                            <textarea
-                                                id="medical_history"
-                                                name="medical_history"
-                                                value={profile.medical_history}
-                                                onChange={handleChange}
-                                                className="form-control"
-                                            ></textarea>
-                                        </div>
-
-                                        <button
-                                            className="btn btn-success me-2"
-                                            onClick={handleSubmit}
-                                            disabled={isSaving}
-                                        >
-                                            {isSaving ? 'Saving...' : 'Save'}
-                                        </button>
-                                        <button
-                                            className="btn btn-secondary"
-                                            onClick={() => setIsEditing(false)}
-                                        >
-                                            Cancel
-                                        </button>
-                                    </>
-                                ) : (
-                                    <>
-                                        <p>
-                                            <strong>Name:</strong>{' '}
-                                            {profile.full_name}
-                                        </p>
-                                        <p>
-                                            <strong>Age:</strong> {profile.age}
-                                        </p>
-                                        <p>
-                                            <strong>Weight:</strong>{' '}
-                                            {profile.weight} lbs
-                                        </p>
-                                        <p>
-                                            <strong>Occupation:</strong>{' '}
-                                            {profile.occupation}
-                                        </p>
-                                        <p>
-                                            <strong>Emergency Contact:</strong>{' '}
-                                            {profile.emergency_contact_name} (
-                                            {profile.emergency_contact})
-                                        </p>
-                                        <p>
-                                            <strong>Phone Number:</strong>{' '}
-                                            {profile.phone_number}
-                                        </p>
-                                        <p>
-                                            <strong>Address:</strong>{' '}
-                                            {profile.address}
-                                        </p>
-                                        <p>
-                                            <strong>Health History:</strong>{' '}
-                                            {profile.medical_history}
-                                        </p>
-
-                                        <button
-                                            className="btn btn-primary"
-                                            onClick={() => setIsEditing(true)}
-                                        >
-                                            Edit Profile
-                                        </button>
-                                    </>
-                                )}
-                            </div>
+                                </div>
+                            ))
+                        ) : (
+                            <p>No assessment results available.</p>
                         )}
                     </div>
                 </div>
             </div>
-        </>
+        </div>
     );
-}
+};
 
 export default ProfilePage;

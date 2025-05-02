@@ -14,6 +14,7 @@ urlpatterns = [
         api_views.PasswordResetEmailVerifyAPIView.as_view(),
     ),
     path("user/password-change/", api_views.PasswordChangeAPIView.as_view()),
+    path("user/profile/", api_views.UserProfileView.as_view(), name="user-profile"),
     # Assessment routes
     path(
         "assessment/questions/",
@@ -26,9 +27,13 @@ urlpatterns = [
         name="submit-response",
     ),
     path(
+        "assessment/start/",
+        api_views.StartAssessmentAPIView.as_view(),
+        name="start-assessment",
+    ),
+    path(
         "assessment/submit/",
-        api_views.SubmitResponsesAPIView.as_view(),
+        api_views.SubmitAssessmentAPIView.as_view(),
         name="submit-responses",
     ),
-    path("user/profile/", api_views.UserProfileView.as_view(), name="user-profile"),
 ]

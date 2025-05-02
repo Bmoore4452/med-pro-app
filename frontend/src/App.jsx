@@ -9,6 +9,8 @@ import ForgotPassword from './views/auth/ForgotPassword';
 import CreateNewPassword from './views/auth/CreateNewPassword';
 import Index from '../src/views/base/Index';
 import AssessmentInterface from './views/assessment/AssessmentInterface';
+import AboutUsPage from '../src/views/base/AboutUsPage';
+import ProfilePage from './views/student/ProfilePage';
 function App() {
     return (
         <BrowserRouter>
@@ -31,6 +33,8 @@ function App() {
                         path="/assessment"
                         element={<AssessmentInterface />}
                     />
+                    <Route path="/about-us" element={<AboutUsPage />} />
+                    <Route path="/profile" element={<ProfilePage />} />
                 </Routes>
             </MainWrapper>
         </BrowserRouter>

@@ -86,6 +86,7 @@ class AssessmentResponseSerializer(serializers.ModelSerializer):
         response = super().create(validated_data)
         if response.selected_choice:
             response.is_correct = response.selected_choice.is_correct
+            print(f"Response created: {response}, is_correct: {response.is_correct}")
             response.save()
         return response
 
@@ -108,6 +109,7 @@ class SubmitResponsesSerializer(serializers.Serializer):
     def validate_profile_id(self, value):
         if not Profile.objects.filter(id=value).exists():
             raise serializers.ValidationError("Profile not found.")
+        print(f"Profile ID: {value}")  # Debugging line
         return value
 
     def create(self, validated_data):
@@ -125,6 +127,7 @@ class SubmitResponsesSerializer(serializers.Serializer):
             responses = AssessmentResponse.objects.filter(
                 profile=profile, question__level=level, question__type="MC"
             )
+            print(f"Responses for level {level}: {responses}")  # Debugging line
             total = int(responses.count())  # Ensure total is an integer
             correct = int(
                 responses.filter(is_correct=True).count()

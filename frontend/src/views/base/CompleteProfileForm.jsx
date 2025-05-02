@@ -74,7 +74,7 @@ function CompleteProfileForm() {
         }
     };
 
-    document.title = 'Complete Profile | Med Pro Assesments';
+    document.title = 'Complete Profile | Med Pro Assessments';
 
     return (
         <div className="container-fluid d-flex flex-sm-row">

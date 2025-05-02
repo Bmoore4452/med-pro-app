@@ -35,7 +35,7 @@ const CommunityFeed = () => {
         fetchPosts();
     };
 
-    document.title = 'Community Feed | Med Pro Assesments';
+    document.title = 'Community Feed | Med Pro Assessments';
 
     return (
         <>

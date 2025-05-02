@@ -23,12 +23,12 @@ function Login() {
             setIsLoading(false);
             alert(error);
         } else {
-            navigate('/profile/');
+            navigate('/');
             alert('You have now been logged in');
             setIsLoading(false);
         }
     };
-    document.title = 'Login | Med Pro Assesments';
+    document.title = 'Login | Med Pro Assessments';
     return (
         <>
             <div className="container-fluid d-flex flex-sm-row">

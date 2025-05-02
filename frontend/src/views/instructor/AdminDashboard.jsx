@@ -32,7 +32,7 @@ const AdminDashboard = () => {
         fetchProfiles();
     }, []);
 
-    document.title = 'Admin Dashboard | Med Pro Assesments';
+    document.title = 'Admin Dashboard | Med Pro Assessments';
 
     return (
         <div className="container-fluid d-flex flex-sm-row">

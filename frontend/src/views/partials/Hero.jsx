@@ -1,24 +1,30 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useAuthStore } from '../../store/auth'; // adjust path as needed
 
+const Hero = () => {
+    const user = useAuthStore((state) => state.allUserData);
 
-function Hero() {
     return (
         <section className="hero d-flex flex-sm{shrink}-2 flex-column justify-content-left align-items-left">
             <div className="hero-content text-center">
                 <div className="hero-text">
                     <h1>Welcome to Med Pro</h1>
-                    <p>Professionalism Assesment</p>
-                    <Link to="/register" className="btn">
-                        Get Started
-                    </Link>
+                    <p>Professionalism Assessment</p>
+                    {user ? (
+                        <Link to="/assessment" className="btn">
+                            Start Assessment
+                        </Link>
+                    ) : (
+                        <Link to="/register" className="btn">
+                            Get Started
+                        </Link>
+                    )}
                 </div>
-                <div className="hero-image">
-
-                </div>
+                <div className="hero-image" />
             </div>
         </section>
     );
-}
+};
 
 export default Hero;

@@ -7,13 +7,15 @@ import Sidebar from '../partials/Sidebar';
 const AssessmentInterface = () => {
     const axios = useAxios;
     const navigate = useNavigate();
-    const [level, setLevel] = useState('1');
+    const [level] = useState('1');
     const [questions, setQuestions] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [answers, setAnswers] = useState([]);
     const [timeLeft, setTimeLeft] = useState(60 * 60); // 60 minutes
     const [profile, setProfile] = useState('');
+    const [currentAssessmentId, setCurrentAssessmentId] = useState(null);
 
+    // Fetch user profile
     useEffect(() => {
         const fetchProfile = async () => {
             try {
@@ -29,6 +31,7 @@ const AssessmentInterface = () => {
 
     console.log('Profile:', profile.id);
 
+    // Fetch questions for the current level
     useEffect(() => {
         const fetchQuestions = async () => {
             try {
@@ -45,7 +48,21 @@ const AssessmentInterface = () => {
         fetchQuestions();
     }, [level]);
 
+    // Start the assessment and timer when the page loads
     useEffect(() => {
+        const startAssessment = async () => {
+            try {
+                const res = await axios.post('/assessment/start/', {
+                    level: '1'
+                });
+                setCurrentAssessmentId(res.data.assessment_id); // Store the assessment ID
+            } catch (err) {
+                console.error('Error starting assessment:', err);
+            }
+        };
+
+        startAssessment();
+
         const timer = setInterval(() => {
             setTimeLeft((prev) => {
                 if (prev <= 1) {
@@ -57,40 +74,33 @@ const AssessmentInterface = () => {
                 return prev - 1;
             });
         }, 1000);
+
         return () => clearInterval(timer);
-    }, [navigate]);
+    }, [axios, navigate]);
 
     const handleSubmitAnswer = async () => {
         const question = questions[currentIndex];
         const answer = answers[currentIndex];
 
-        await axios.post('/assessment/submit-response/', {
-            profile: profile.id,
-            question: question.id,
-            selected_choice: answer
-        });
-
-        const next = currentIndex + 1;
-        if (next < questions.length) {
-            setCurrentIndex(next);
-        } else {
-            const res = await axios.post('/assessment/submit/', {
-                profile_id: profile.id
+        try {
+            await axios.post('/assessment/submit-response/', {
+                assessment: currentAssessmentId, // Include the assessment ID
+                profile: profile.id,
+                question: question.id,
+                selected_choice: answer
             });
-            console.log('✅✅', res.data);
 
-            const current = res.data.results.find((r) => r.level === level);
-            if (current.passed) {
-                if (level === '3') {
-                    alert('✅ All levels passed!');
-                    // navigate('/dashboard');
-                } else {
-                    setLevel((prev) => String(parseInt(prev) + 1));
-                }
+            const next = currentIndex + 1;
+            if (next < questions.length) {
+                setCurrentIndex(next);
             } else {
-                console.log(`❌ Failed Level ${level}: ${current.feedback}`);
-                // screen.location.reload();
+                const res = await axios.post('/assessment/submit/', {
+                    assessment_id: currentAssessmentId // Include the assessment ID
+                });
+                console.log('✅✅', res.data);
             }
+        } catch (err) {
+            console.error('Error submitting answer:', err);
         }
     };
 

@@ -34,7 +34,7 @@ const DashboardPage = () => {
         fetchData();
     }, []);
 
-    document.title = `${firstName}'s Dashboard | Med Pro Assesments`;
+    document.title = `${firstName}'s Dashboard | Med Pro Assessments`;
 
     return (
         <>

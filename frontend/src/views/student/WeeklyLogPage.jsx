@@ -138,7 +138,7 @@ const WeeklyLogPage = () => {
         }
     };
 
-    document.title = 'Weekly Logs | Med Pro Assesments';
+    document.title = 'Weekly Logs | Med Pro Assessments';
 
     return (
         <>

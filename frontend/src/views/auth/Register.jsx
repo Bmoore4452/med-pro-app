@@ -24,7 +24,7 @@ function Register() {
             alert(error);
             setIsLoading(false);
         } else {
-            navigate('/complete-profile/');
+            navigate('/');
             alert('Registration successful! You can now log in.');
             setIsLoading(false);
         }
