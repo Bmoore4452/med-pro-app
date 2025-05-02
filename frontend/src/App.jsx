@@ -8,15 +8,7 @@ import Logout from './views/auth/Logout';
 import ForgotPassword from './views/auth/ForgotPassword';
 import CreateNewPassword from './views/auth/CreateNewPassword';
 import Index from '../src/views/base/Index';
-import Dashboard from './views/student/Dashboard';
-import ProfilePage from './views/student/ProfilePage';
-
-import CompleteProfileForm from './views/base/CompleteProfileForm';
-import WeeklyLogPage from './views/student/WeeklyLogPage';
-import DashboardPage from './views/student/DashboardPage';
-import AdminDashboard from './views/instructor/AdminDashboard';
-import CommunityFeed from './views/base/CommunityFeed';
-
+import AssessmentInterface from './views/assessment/AssessmentInterface';
 function App() {
     return (
         <BrowserRouter>
@@ -36,18 +28,9 @@ function App() {
                     />
                     <Route path="/" element={<Index />} />
                     <Route
-                        path="/complete-profile"
-                        element={<CompleteProfileForm />}
+                        path="/assessment"
+                        element={<AssessmentInterface />}
                     />
-                    <Route
-                        path="/complete-profile/:id"
-                        element={<CompleteProfileForm />}
-                    />
-                    <Route path="/profile" element={<ProfilePage />} />
-                    <Route path="/weekly-log" element={<WeeklyLogPage />} />
-                    <Route path="/dashboard" element={<DashboardPage />} />
-                    <Route path="/admin" element={<AdminDashboard />} />
-                    <Route path="/community" element={<CommunityFeed />} />
                 </Routes>
             </MainWrapper>
         </BrowserRouter>

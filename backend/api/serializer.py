@@ -66,7 +66,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 class ChoiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Choice
-        fields = ["id", "text"]
+        fields = "__all__"
 
 
 class AssessmentQuestionSerializer(serializers.ModelSerializer):
@@ -82,6 +82,13 @@ class AssessmentResponseSerializer(serializers.ModelSerializer):
         model = AssessmentResponse
         fields = "__all__"
 
+    def create(self, validated_data):
+        response = super().create(validated_data)
+        if response.selected_choice:
+            response.is_correct = response.selected_choice.is_correct
+            response.save()
+        return response
+
 
 class ResultSerializer(serializers.ModelSerializer):
     class Meta:
@@ -95,37 +102,57 @@ class FeedbackSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-def create(self, validated_data):
-    profile = Profile.objects.get(id=validated_data["profile_id"])
-    feedback_data = {
-        "1": "Improve your communication and patient interaction.",
-        "2": "Focus on collaboration and delivering consistent care.",
-        "3": "Review ethical protocols and decision-making best practices.",
-    }
+class SubmitResponsesSerializer(serializers.Serializer):
+    profile_id = serializers.IntegerField()
 
-    results = []
-    for level in ["1", "2", "3"]:
-        responses = AssessmentResponse.objects.filter(
-            profile=profile, question__level=level, question__type="MC"
-        )
-        total = responses.count()
-        correct = responses.filter(is_correct=True).count()
-        score = (correct / total * 100) if total > 0 else 0
-        passed = score >= 60
+    def validate_profile_id(self, value):
+        if not Profile.objects.filter(id=value).exists():
+            raise serializers.ValidationError("Profile not found.")
+        return value
 
-        result = Result.objects.create(
-            profile=profile, level=level, score=score, passed=passed
-        )
+    def create(self, validated_data):
+        profile = Profile.objects.get(id=validated_data["profile_id"])
+        feedback_data = {
+            "1": "Improve your communication and patient interaction.",
+            "2": "Focus on collaboration and delivering consistent care.",
+            "3": "Review ethical protocols and decision-making best practices.",
+        }
 
-        result_data = {"level": level, "score": score, "passed": passed}
+        results = []
+        for level in ["1", "2", "3"]:
+            total = 0
+            correct = 0
+            responses = AssessmentResponse.objects.filter(
+                profile=profile, question__level=level, question__type="MC"
+            )
+            total = int(responses.count())  # Ensure total is an integer
+            correct = int(
+                responses.filter(is_correct=True).count()
+            )  # Ensure correct is an integer
 
-        if not passed:
-            feedback_text = feedback_data.get(level, "Please improve.")
-            Feedback.objects.create(result=result, recommendation=feedback_text)
-            result_data["feedback"] = feedback_text
-            results.append(result_data)
-            break  # Stop progression to next level
-        else:
-            results.append(result_data)
+            print(f"total: {total}")  # Debugging line
+            print(f"correct: {correct}")  # Debugging line
 
-    return {"results": results}
+            if total == 0:
+                continue  # Avoid division by zero
+
+            points_per_question = 100 / total
+            score = round(correct * points_per_question, 2)
+            passed = score >= 60
+
+            result = Result.objects.create(
+                profile=profile, level=level, score=score, passed=passed
+            )
+
+            result_data = {"level": level, "score": score, "passed": passed}
+
+            if not passed:
+                feedback_text = feedback_data.get(level, "Please improve.")
+                Feedback.objects.create(result=result, recommendation=feedback_text)
+                result_data["feedback"] = feedback_text
+                results.append(result_data)
+                break
+            else:
+                results.append(result_data)
+
+        return {"results": results}

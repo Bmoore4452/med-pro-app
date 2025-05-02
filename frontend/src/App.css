@@ -226,7 +226,6 @@ html {
     animation: heroFadeIn 1.5s ease-out forwards;
     opacity: 0; /*Start hidden until animated*/
     padding: 1rem;
-
 }
 
 .hero-content {
@@ -238,7 +237,7 @@ html {
 }
 
 .hero-text {
-   display: flex;
+    display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
@@ -246,7 +245,6 @@ html {
     font-size: 1.2rem;
     justify-content: start;
     width: 50%;
-
 }
 
 .hero-image {
@@ -256,9 +254,7 @@ html {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     filter: grayscale(0.5);
     transition: filter 0.3s;
-
 }
-
 
 .hero h1 {
     margin: 0;
@@ -600,6 +596,17 @@ h4 {
     max-width: 100%;
 }
 
+.form-check-label:hover {
+    color: var(--base-clr) !important;
+    text-decoration: none !important;
+    background-color: var(--hover-clr);
+}
+.form-check-input:hover {
+    color: var(--base-clr) !important;
+    text-decoration: none !important;
+    background-color: var(--hover-clr);
+}
+
 /*! Small devices (phones, 576px and up) */
 
 @media (max-width: 576px) {
@@ -688,8 +695,8 @@ h4 {
     } */
 
     .hero {
-        background-image: url(../src/assets/IMG_0643.jpg);
-        background-size: cover;
+        background-image: url(../src/assets/AdobeStock_827459910.png);
+        background-size: cover !important;
         background-repeat: no-repeat;
         background-position: center !important;
         padding: 2rem;
@@ -697,22 +704,31 @@ h4 {
     }
 
     .hero-content {
-        width: 100%; /* Make hero content full width */
+        width: 100%;
+        flex-direction: column;
+        
     }
 
     .hero h1 {
-        font-size: 1.5rem; /* Reduce font size */
+        font-size: 1.5rem;
         background-color: var(--hover-clr);
     }
 
     .hero p {
-        font-size: 0.9rem; /* Reduce font size */
+        font-size: 0.9rem;
         background-color: var(--hover-clr);
     }
 
     .hero .btn {
-        width: 80%; /* Adjust button width */
+        width: 80%;
     }
+
+    .hero-text {
+        display: flex;
+        width: 100%;
+        text-align: center;
+    }   
+
 
     .calendar-container {
         grid-template-columns: repeat(1, 1fr) !important;

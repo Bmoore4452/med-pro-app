@@ -130,8 +130,41 @@ class SubmitResponsesAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
+        print("🔎 Incoming request:", request.data)  # Add this line
         serializer = api_serializer.SubmitResponsesSerializer(data=request.data)
         if serializer.is_valid():
             result = serializer.save()
             return Response(result, status=status.HTTP_200_OK)
+        print("❌ Invalid data:", serializer.errors)  # Add this line too
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class AssessmentQuestionListView(generics.ListAPIView):
+    serializer_class = api_serializer.AssessmentQuestionSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        level = self.request.query_params.get("level")
+        return AssessmentQuestion.objects.filter(level=level)
+
+
+class AssessmentResponseSubmitView(generics.CreateAPIView):
+    serializer_class = api_serializer.AssessmentResponseSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if not serializer.is_valid():
+            print("🔴 Invalid data:", serializer.errors)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        self.perform_create(serializer)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class UserProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        profile = Profile.objects.get(user=request.user)
+        serializer = api_serializer.ProfileSerializer(profile)
+        return Response(serializer.data)
