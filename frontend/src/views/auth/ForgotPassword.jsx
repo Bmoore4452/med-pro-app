@@ -1,12 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import BaseHeader from '../partials/BaseHeader';
 import BaseFooter from '../partials/BaseFooter';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import apiInstance from '../../utils/axios';
 
 function ForgotPassword() {
     const [email, setEmail] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const navigate = useNavigate();
 
     const handleEmailSubmit = async (event) => {
         event.preventDefault();
@@ -21,6 +22,7 @@ function ForgotPassword() {
                     alert(
                         'Password reset link has been sent to your email address'
                     );
+                    navigate('/');
                 });
         } catch (error) {
             console.log('error: ', error);

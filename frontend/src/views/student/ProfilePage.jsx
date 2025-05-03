@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import useAxios from '../../utils/useAxios';
+
 import Sidebar from '../partials/Sidebar';
 import BaseHeader from '../partials/BaseHeader';
 import { useAuthStore } from '../../store/auth';
 
 const ProfilePage = () => {
-    const axios = useAxios;
     const user = useAuthStore((state) => state.allUserData);
     const firstName = user?.full_name?.split(' ')[0] || 'User';
 
