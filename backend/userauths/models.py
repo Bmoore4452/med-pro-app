@@ -92,8 +92,11 @@ class Assessment(models.Model):
 
 class AssessmentResponse(models.Model):
     assessment = models.ForeignKey(
-        Assessment, on_delete=models.CASCADE, related_name="responses", null=True,
-        blank=True
+        Assessment,
+        on_delete=models.CASCADE,
+        related_name="responses",
+        null=True,
+        blank=True,
     )
     profile = models.ForeignKey(
         Profile, on_delete=models.CASCADE, related_name="assessment_responses"

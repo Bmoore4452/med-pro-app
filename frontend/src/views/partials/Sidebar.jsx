@@ -1,46 +1,38 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import '../../App.css'; // Adjust this path if needed
 import { Link } from 'react-router-dom';
 import Cookie from 'js-cookie';
-import useAxios from '../../utils/useAxios'; // Adjust this path if needed
 import ATFLogo from '../../assets/med_pro logo.png'; // Adjust this path if needed
+import useAxios from '../../utils/useAxios';
 
 const Sidebar = () => {
+    const axios = useAxios;
     const [isSidebarClosed, setIsSidebarClosed] = useState(true);
-    const [isSubmenuOpen, setIsSubmenuOpen] = useState(false);
-    const [hasPaid, setHasPaid] = useState(false);
     const [isStaff, setIsStaff] = useState(false);
-    const axiosInstance = useAxios;
-    // const user = useAuthStore((state) => state.allUserData);
 
     const isAuthenticated = !!Cookie.get('access_token');
 
     useEffect(() => {
-        const fetchUserStatus = async () => {
-            try {
-                const response = await axiosInstance.get('/user/profile/'); // Adjust endpoint
-                const user = await axiosInstance.get('/user/');
+        if (!isAuthenticated) {
+            setIsStaff(false);
+            return;
+        }
 
-                setHasPaid(response.data.has_paid);
-                setIsStaff(user.data.is_staff);
+        const loadUser = async () => {
+            try {
+                const res = await axios.get('/user/');
+                setIsStaff(Boolean(res.data?.is_staff));
             } catch (error) {
-                console.error('Failed to fetch user status:', error);
+                console.error('Unable to load user role for sidebar:', error);
+                setIsStaff(false);
             }
         };
 
-        if (isAuthenticated) {
-            fetchUserStatus();
-        }
-    }, [isAuthenticated]);
+        loadUser();
+    }, [isAuthenticated, axios]);
 
     const toggleSidebar = () => {
         setIsSidebarClosed(!isSidebarClosed);
-        setIsSubmenuOpen(false);
-    };
-
-    const toggleSubmenu = () => {
-        setIsSubmenuOpen(!isSubmenuOpen);
-        if (isSidebarClosed) setIsSidebarClosed(false);
     };
 
     return (
@@ -176,58 +168,6 @@ const Sidebar = () => {
                                         <span>About Us</span>
                                     </Link>
                                 </li>
-                                {hasPaid && (
-                                    <li>
-                                        <button
-                                            onClick={toggleSubmenu}
-                                            className={`dropdown-btn ${isSubmenuOpen ? 'rotate' : ''}`}
-                                        >
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                height="24px"
-                                                viewBox="0 -960 960 960"
-                                                width="24px"
-                                                fill="#e3e3e3"
-                                            >
-                                                <path d="m536-84-56-56 142-142-340-340-142 142-56-56 56-58-56-56 84-84-56-58 56-56 58 56 84-84 56 56 58-56 56 56-142 142 340 340 142-142 56 56-56 58 56 56-84 84 56 58-56 56-58-56-84 84-56-56-58 56Z" />
-                                            </svg>
-                                            <span>All In Fitness</span>
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                height="24px"
-                                                viewBox="0 -960 960 960"
-                                                width="24px"
-                                                fill="#e3e3e3"
-                                            >
-                                                <path d="M480-360 280-560h400L480-360Z" />
-                                            </svg>
-                                        </button>
-                                        <ul
-                                            className={`sub-menu ${isSubmenuOpen ? 'show' : ''}`}
-                                        >
-                                            <div>
-                                                <li>
-                                                    <Link to="/weekly-log">
-                                                        <svg
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                            width="16"
-                                                            height="16"
-                                                            fill="currentColor"
-                                                            className="bi bi-fire"
-                                                            viewBox="0 0 16 16"
-                                                        >
-                                                            <path d="M8 16c3.314 0 6-2 6-5.5 0-1.5-.5-4-2.5-6 .25 1.5-1.25 2-1.25 2C11 4 9 .5 6 0c.357 2 .5 4-2 6-1.25 1-2 2.729-2 4.5C2 14 4.686 16 8 16m0-1c-1.657 0-3-1-3-2.75 0-.75.25-2 1.25-3C6.125 10 7 10.5 7 10.5c-.375-1.25.5-3.25 2-3.5-.179 1-.25 2 1 3 .625.5 1 1.364 1 2.25C11 14 9.657 15 8 15" />
-                                                        </svg>
-                                                        <span>
-                                                            Ignite & Tone
-                                                        </span>
-                                                    </Link>
-                                                </li>
-                                            </div>
-                                        </ul>
-                                    </li>
-                                )}
-
                                 <li>
                                     <Link to="/profile">
                                         <svg
@@ -242,25 +182,9 @@ const Sidebar = () => {
                                         <span>Profile</span>
                                     </Link>
                                 </li>
-                                {hasPaid && (
-                                    <li>
-                                        <Link to="/dashboard">
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                height="24px"
-                                                viewBox="0 -960 960 960"
-                                                width="24px"
-                                                fill="#e3e3e3"
-                                            >
-                                                <path d="M480-80q-82 0-155-31.5t-127.5-86Q143-252 111.5-325T80-480q0-83 31.5-155.5t86-127Q252-817 325-848.5T480-880q83 0 155.5 31.5t127 86q54.5 54.5 86 127T880-480q0 82-31.5 155t-86 127.5q-54.5 54.5-127 86T480-80Zm0-240q60 0 117 17.5T704-252q46-46 71-104.5T800-480q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 65 24.5 124T256-252q50-33 107-50.5T480-320Zm0 80q-41 0-80 10t-74 30q35 20 74 30t80 10q41 0 80-10t74-30q-35-20-74-30t-80-10ZM280-520q17 0 28.5-11.5T320-560q0-17-11.5-28.5T280-600q-17 0-28.5 11.5T240-560q0 17 11.5 28.5T280-520Zm120-120q17 0 28.5-11.5T440-680q0-17-11.5-28.5T400-720q-17 0-28.5 11.5T360-680q0 17 11.5 28.5T400-640Zm280 120q17 0 28.5-11.5T720-560q0-17-11.5-28.5T680-600q-17 0-28.5 11.5T640-560q0 17 11.5 28.5T680-520ZM480-400q33 0 56.5-23.5T560-480q0-13-4-25.5T544-528l54-136q7-16 .5-31.5T576-718q-15-7-30.5-.5T524-696l-54 136q-30 5-50 27.5T400-480q0 33 23.5 56.5T480-400Zm0 80Zm0-206Zm0 286Z" />
-                                            </svg>
-                                            <span>Dashboard</span>
-                                        </Link>
-                                    </li>
-                                )}
                                 {isStaff && (
                                     <li>
-                                        <Link to="/admin">
+                                        <Link to="/staff">
                                             <svg
                                                 xmlns="http://www.w3.org/2000/svg"
                                                 height="24px"
@@ -268,9 +192,9 @@ const Sidebar = () => {
                                                 width="24px"
                                                 fill="#e3e3e3"
                                             >
-                                                <path d="M480-440q-59 0-99.5-40.5T340-580q0-59 40.5-99.5T480-720q59 0 99.5 40.5T620-580q0 59-40.5 99.5T480-440Zm0-80q26 0 43-17t17-43q0-26-17-43t-43-17q-26 0-43 17t-17 43q0 26 17 43t43 17Zm0 440q-139-35-229.5-159.5T160-516v-244l320-120 320 120v244q0 152-90.5 276.5T480-80Zm0-400Zm0-315-240 90v189q0 54 15 105t41 96q42-21 88-33t96-12q50 0 96 12t88 33q26-45 41-96t15-105v-189l-240-90Zm0 515q-36 0-70 8t-65 22q29 30 63 52t72 34q38-12 72-34t63-52q-31-14-65-22t-70-8Z" />
+                                                <path d="M400-480q33 0 56.5-23.5T480-560q0-33-23.5-56.5T400-640q-33 0-56.5 23.5T320-560q0 33 23.5 56.5T400-480Zm0 240q139 0 243.5-91T760-560q-12-31-29.5-57T689-662l57-58q20 15 37 34t31 42q22 44 34 91t12 93q0 167-117 283.5T460-60v-101q95-11 170.5-72T740-400q-43 76-121 118t-179 42q-80 0-151.5-29T160-351v-130q0-29 15.5-53t40.5-36q54-25 90-37.5t94-12.5Zm160 180v-200h320v200H560Zm80-80h160v-40H640v40ZM120-760v-120h320v120H120Z" />
                                             </svg>
-                                            <span>Admin Dashboard</span>
+                                            <span>Staff Dashboard</span>
                                         </Link>
                                     </li>
                                 )}

@@ -159,3 +159,12 @@ class SubmitResponsesSerializer(serializers.Serializer):
                 results.append(result_data)
 
         return {"results": results}
+
+
+class UxTelemetryEventSerializer(serializers.Serializer):
+    event_type = serializers.CharField(max_length=100)
+    stage = serializers.CharField(max_length=30, required=False, allow_blank=True)
+    level = serializers.CharField(max_length=10, required=False, allow_blank=True)
+    assessment_id = serializers.IntegerField(required=False, allow_null=True)
+    time_left = serializers.IntegerField(required=False, allow_null=True)
+    details = serializers.JSONField(required=False)

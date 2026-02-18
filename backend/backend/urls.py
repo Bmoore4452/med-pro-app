@@ -30,7 +30,7 @@ schema_view = get_schema_view(
     openapi.Info(
         title="Med Pro App Backend APIs",
         default_version="v1",
-        description="This is the API documentation for All Things Fit project APIs",
+        description="This is the API documentation for Med Pro App project APIs",
         terms_of_service="https://www.google.com/policies/terms/",
         contact=openapi.Contact(email="brianlmoore803@gmail.com"),
         license=openapi.License(name="BSD License"),
